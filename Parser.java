@@ -1,8 +1,11 @@
 package tree;
 import java.io.*;
 import java.util.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 public class Parser {
-public Person parse(String filepath) throws IOException
+public Person parse(String filepath) throws IOException,ParseException
 {
 	try {
 		FileReader fl = new FileReader(filepath);
@@ -33,15 +36,27 @@ public Person parse(String filepath) throws IOException
 						token2=st2.nextToken();
 						person.bio=token2;
 					}
-					else if(token2.equals("dob"))//convert the date stored in string format to a Date object.
+					else if(token2.equals("dob")) //convert the date stored in string format to a Date object.
 					{
+						try {							
 						token2=st2.nextToken();
-						person.dob=Integer.parseInt(token2);
+						SimpleDateFormat formatter = new SimpleDateFormat("ddmmyyyy");
+						person.dob=formatter.parse(token2);
+						}catch(ParseException e)
+						{
+							System.out.println(e);
+						}
 					}
-					else if(token2.equals("id"))
+					else if(token2.equals("dod"))
 					{
+						try {
 						token2=st2.nextToken();
-						person.dod=Integer.parseInt(token2);
+						SimpleDateFormat formatter = new SimpleDateFormat("ddmmyyyy");
+						person.dod=formatter.parse(token2);
+						}catch(ParseException e)
+						{
+							System.out.println(e);
+						}
 					}
 			}
 		}

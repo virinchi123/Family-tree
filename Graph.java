@@ -1,5 +1,6 @@
 package graph;
 import java.util.ArrayList;
+import tree.Person;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -23,7 +24,10 @@ public void addEdge(Node a,Node b)
 	Edge edge = new Edge(a,b);
 	Edges.add(edge);
 }
-/**takes 2 nodes and relationship type as param and adds the resultant edge to the graph.
+/**takes 2 nodes and relationship type as param and adds the resultant edge to the graph. Method also creates any implied edges 
+ * that might have to be added.
+ * For example, if an edge is created between a,b of type 1, ie)a is the child of b, then an edge is created between b,a of type 2
+ * ie) b is the parent of a.
  * @param a source node for directed edge
  * @param b destination node for directed edge
  * @param w relationship type
@@ -32,6 +36,31 @@ public void addEdge(Node a,Node b,int w)
 {
 	Edge edge = new Edge(a,b,w);
 	Edges.add(edge);
+	if(w==1)
+	{
+		Edge edge2 = new Edge(b,a,2);
+		Edges.add(edge2);
+	}
+	else if(w==2)
+	{
+		Edge edge2 = new Edge(b,a,1);
+		Edges.add(edge2);
+	}
+	else if(w==3)
+	{
+		Edge edge2 = new Edge(b,a,3);
+		Edges.add(edge2);
+	}
+	else if(w==5)
+	{
+		Edge edge2 = new Edge(b,a,6);
+		Edges.add(edge2);
+	}
+	else if(w==6)
+	{
+		Edge edge2 = new Edge(b,a,5);
+		Edges.add(edge2);
+	}
 }
 /**Takes an edge as parameter and deletes the edge from the graph
  * @param e
@@ -213,9 +242,63 @@ public void displayEdges()
 		System.out.println(b.nodes[0].name+" "+b.nodes[1].name+" "+b.type +" " + b.weight);
 	}
 }
+/**
+ * Prints the vertices and edges in Graph to the console by invoking displayVertices() and displayEdges() in that order.
+ */
 public void summarise()
 {
 	this.displayVertices();
 	this.displayEdges();
+}
+/** gets the relationship between two persons passed as parameters in the given family tree
+ * 
+ * @param a 
+ * @param b
+ * @return an ArrayList object which contains the list of persons to be traversed from Person a in order to reach Person b
+ */
+public ArrayList<Person> getRelationship(Person a, Person b)
+{
+	ArrayList<Person> path = new ArrayList<Person>();
+	int NoOfVertices = Nodes.size();
+	int i=0;
+	int[] distance = new int[NoOfVertices];
+	ArrayList<Person> predecessor = new ArrayList<Person>();
+	/* Bellman-Ford algorithm used to calculate closest relationship*/
+	while(i<NoOfVertices)//initialise distance to a very large number.
+	{
+		distance[i]=99999999;
+	}
+	distance[a.getId()]=0;
+	
+	if(Nodes.contains(a) && Nodes.contains(b))
+	{
+		Iterator<Edge> iterator = Edges.iterator();
+		int a_id,b_id=0;
+		while(iterator.hasNext())
+		{
+			Edge edge = iterator.next();
+			a_id = edge.nodes[0].id;
+			b_id = edge.nodes[1].id;
+			if((distance[a_id]+edge.weight)<distance[b_id])
+			{
+				distance[b_id]=distance[a_id]+edge.weight;
+				predecessor.set(b_id, a);
+			}
+		}
+		b_id = b.getId();
+		while(true)
+		{
+			Person c = predecessor.get(b_id);
+			//path.set(NoOfVertices, c);
+			path.add(c);
+			//NoOfVertices--;
+			if(c.equals(a))
+			{
+				break;
+			}
+			b_id=distance[c.getId()];
+		}
+	}
+	return path;
 }
 }
